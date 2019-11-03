@@ -254,12 +254,17 @@ def get_meraki_http_info():
 
         # Load administered orgs XHR Data
         #xhrurl = "https://" + mhost + baseurl + "manage/organization/administered_orgs"
-        xhrurl = "https://" + mhost + baseurl + "manage/organization/org_json?jsonp=jQuery18307230485578098947_" + str(int(time.time() * 1000)) + "&t0=" + str(int(time.time())) + ".000" + "&t1=" + str(int(time.time())) + ".000" + "&primary_load=true&_=" + str(int(time.time() * 1000))
+        xhrurl = "https://" + mhost + baseurl + "manage/organization/org_json?jsonp=jQuery183039838304928247004_" + str(int(time.time() * 1000)) + "&t0=" + str(int(time.time())) + ".000" + "&t1=" + str(int(time.time())) + ".000" + "&primary_load=true&_=" + str(int(time.time() * 1000))
         xhrheader = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:51.0) Gecko/20100101 Firefox/51.0',"X-CSRF-Token": xhrtoken,"X-Requested-With": "XMLHttpRequest"}
         r = session.get(xhrurl, headers=xhrheader, cookies=cookies)
         rcontent = r.content.decode("UTF-8")
         rjson = json.loads(rcontent[rcontent.find("({")+1:-1])
-        #print(rjson)
+
+        xhrurl = "https://" + mhost + baseurl + "manage/organization/org_json?jsonp=jQuery183039838304928247004_" + str(int(time.time() * 1000)) + "&t0=" + str(int(time.time())) + ".000" + "&t1=" + str(int(time.time())) + ".000" + "&device_load=true&_=" + str(int(time.time() * 1000))
+        xhrheader = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:51.0) Gecko/20100101 Firefox/51.0',"X-CSRF-Token": xhrtoken,"X-Requested-With": "XMLHttpRequest"}
+        r = session.get(xhrurl, headers=xhrheader, cookies=cookies)
+        rcontent2 = r.content.decode("UTF-8")
+        rjson2 = json.loads(rcontent2[rcontent2.find("({")+1:-1])
 
         outjson = {}
         mbase = rjson["networks"]
@@ -270,9 +275,9 @@ def get_meraki_http_info():
             outjson["networks"][mbase[jitem]["name"]] = {"baseurl": "https://" + mhost + "/" + mbase[jitem]["tag"] + "/n/" + mbase[jitem]["eid"] + meraki_www_get_path(mbase[jitem]["type"], "")}           #, "id": mbase[jitem]["id"]
 
             # This generates the link to the device
-            for jdev in rjson["nodes"]:
-                if rjson["nodes"][jdev]["ng_id"] == mbase[jitem]["id"]:
-                    outjson["devices"][rjson["nodes"][jdev]["mac"]] = {"baseurl": "https://" + mhost + "/" + mbase[jitem]["tag"] + "/n/" + mbase[jitem]["eid"] + meraki_www_get_path(mbase[jitem]["type"], rjson["nodes"][jdev]["id"]), "desc": rjson["nodes"][jdev]["name"]}              #mbase[jitem]["id"]          #rjson["nodes"][jdev]["serial"]
+            for jdev in rjson2["nodes"]:
+                if rjson2["nodes"][jdev]["ng_id"] == mbase[jitem]["id"]:
+                    outjson["devices"][rjson2["nodes"][jdev]["mac"]] = {"baseurl": "https://" + mhost + "/" + mbase[jitem]["tag"] + "/n/" + mbase[jitem]["eid"] + meraki_www_get_path(mbase[jitem]["type"], rjson2["nodes"][jdev]["id"]), "desc": rjson2["nodes"][jdev]["name"]}              #mbase[jitem]["id"]          #rjson["nodes"][jdev]["serial"]
 
         return outjson
     else:
@@ -280,8 +285,9 @@ def get_meraki_http_info():
         return {}
 
 
-#dbjson = get_meraki_http_info()
-#print(json.dumps(dbjson))
+if __name__ == "__main__":
+    dbjson = get_meraki_http_info()
+    print(json.dumps(dbjson))
 #os.environ["MERAKI_DASHBOARD_MAP"] = str(dbjson)
 #print(str(dbjson))
 #print("=======")
